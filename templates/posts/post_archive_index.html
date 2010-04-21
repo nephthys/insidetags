@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Toutes les archives" %}{% endblock %}
+{% block fil_ariane %}<a href="{% url archive_index %}">{% trans "Archives" %}</a> d{% endblock %}
+
+{% block content %}
+<h1>{% trans "Archives par date" %}</h1>
+
+<div class="postcontent">
+<ul class="archives_list">
+{% for date in list_dates reversed %}
+{% ifchanged date|date:"Y" %}<li class="item_separator"><strong><a href="{% url archive_year date|date:"Y" %}">{% blocktrans with date|date:"Y" as year %}Année {{ year }}{% endblocktrans %}</a></strong></li>{% endifchanged %}
+<li><a href="{% url archive_month date|date:"Y" date|date:"b" %}">{{ date|date:"F Y" }}</a></li>
+{% endfor %}
+</ul>
+</div>
+
+{% endblock %}

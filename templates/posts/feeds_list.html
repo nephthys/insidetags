@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "S'abonner au blog" %}{% endblock %}
+{% block fil_ariane %}{% trans "Flux RSS" %}{% endblock %}
+
+{% block content %}
+<h1>{% trans "Tous les flux RSS" %}</h1>
+
+<div class="postcontent">
+<ul class="archives_list">
+	<li><a href="{% url feeds %}posts/">{% trans "Tous les articles publiés" %}</a>
+		<ul>
+		{% for cat in cats_list %}
+		<li><a href="{% url feeds %}category/{{ cat.slug }}/">{{ cat.name }}</a></li>
+		{% endfor %}
+		</ul>
+	<br /></li>
+	<li><a href="{% url feeds %}featured/">{% trans "Articles recommandés" %}</a><br /><br /></li>
+	<li><a href="{% url feeds %}comments/">{% trans "Derniers commentaires postés" %}</a></li>
+</ul>
+</div>
+
+{% endblock %}

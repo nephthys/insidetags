@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load i18n common_tags %}
+{% block title %}{% trans "Dashboard" %}{% endblock %}
+{% block fil_ariane %}<a href="{% url dashboard %}">{% trans "Mon compte" %}</a> &gt; {% trans "Dashboard" %}{% endblock %}
+{% block content %}
+<h1>{% trans "Mon compte" %}</h1>
+
+<dl class="stats_inline">
+	<dt>{% trans "Articles publiés" %}</dt>
+	<dd>{{ nb_posts_online}}</dd>
+	<dt>{% trans "Commentaires postés" %}</dt>
+	<dd>{{ comments_count }}</dd>
+	<dt>{% trans "Connexions" %}</dt>
+	<dd>{{ profile.nb_login }}</dd>
+</dl>
+
+<div class="clearer"></div><br />
+
+
+<h3>{% trans "Derniers articles" %} <a href="{% url create_post %}" class="bouton_action">{% trans "Nouvel article" %}</a></h3>
+
+{% if posts_list %}
+{% for post in posts_list %}
+<div class="my_posts post_{% cycle odd,even %}">
+<div class="row_post display_clean" id="post_{{ post.id }}">
+	<div class="date_left">{% if post.published_at %}{{ post.published_at|date_diff }}{% else %}{{ post.updated_at|date_diff }}{% endif %}</div>
+	<h2 class="post_title{% ifnotequal post.status 3 %} not_published_yet{% endifnotequal %}"><a href="{{ post.get_absolute_url }}" title="{% blocktrans with post.category as category %}Dans {{ category }}{% endblocktrans %}">{{ post.title }}</a></h2>
+</div>
+<ul class="data_posts">
+	<li>{% blocktrans with post.updated_at|date_diff as date %}Dernière modification {{ date }}{% endblocktrans %}</li>
+	{% ifequal post.status 3 %}<li>{% blocktrans with post.published_at|date_diff as date %}Publié {{ date }}{% endblocktrans %}</li>{% endifequal %}
+	<li>{% trans "Etat" %} : {{ post.get_status_display }}</li>
+	{% ifequal post.status 1 %}<li><a href="{% url update_post post.id %}" class="bouton_vert">{% trans "Editer" %}</a> <span class="tpetit">{% trans "ou" %}</span> <a href="{% url submit_post post.id %}" class="bouton_action">{% trans "Proposer à la validation" %}</a></li>{% endifequal %}
+</ul>
+</div>
+{% endfor %}
+{% else %}
+{% url create_post as url_submit %}
+<p>{% trans "Vous avez rédigé aucun article" %} &mdash; {% blocktrans with post_create as url %}Commencez dès maintenant en <a href="{{ url }}">proposant un article</a>{% endblocktrans %}</p>
+{% endif %}
+
+
+<h3>{% trans "Derniers commentaires" %}</h3>
+
+{% if comments_list %}
+<ul>
+{% for comment in comments_list %}
+<li><a href="{% url redirect_to_comment comment.id %}">{{ comment.submit_date|date_diff }}</a><br />
+{{ comment.comment|safe|striptags|truncatewords:150 }}</li>
+{% endfor %}
+</ul>
+{% else %}
+
+{% endif %}
+
+{% endblock %}

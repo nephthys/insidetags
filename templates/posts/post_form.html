@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load i18n common_tags %}
+{% block title %}{% trans "Proposer un article" %}{% endblock %}
+{% block fil_ariane %}<a href="{% url dashboard %}">{% trans "Mon compte" %}</a> &gt; {% trans "Proposer un article" %}{% endblock %}
+{% block content %}
+<h1>{% trans "Proposer un article" %}</h1>
+
+<form action="" method="post">
+	{{ form.as_p }}
+	
+	<p class="submit_form">
+		<input name="submit" type="submit" value="{% trans "Envoyer" %}" />
+	</p>
+</form>
+
+{% endblock %}

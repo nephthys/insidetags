@@ -1,0 +1,116 @@
+{% load i18n common_tags blog_layout %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		{% block metas %}{% endblock %}
+		{% block feeds %}
+		<link rel="alternate" type="application/rss+xml" title="{% trans "Derniers articles publiés" %}" href="{% if FEED_URL_POSTS %}{{ FEED_URL_POSTS }}{% else %}/feeds/posts/{% endif %}" />
+		<link rel="alternate" type="application/rss+xml" title="{% trans "Derniers commentaires postés" %}" href="{% if FEED_URL_COMMENTS %}{{ FEED_URL_COMMENTS }}{% else %}/feeds/comments/{% endif %}" />
+		{% endblock %}
+		<title>{% block title %}test{% endblock %}</title>
+		<link href="/site_media/css/design.min.css" rel="stylesheet" type="text/css" media="screen, handheld, tv, projection" />
+	</head>
+	<body>
+
+	<p id="goto"><a href="#sidebar">{% trans "Aller au menu" %}</a> - <a href="#content">{% trans "Aller au contenu" %}</a> - <a href="#search">{% trans "Aller à la recherche" %}</a></p>
+	
+	<div id="header">
+		<div class="width_content">
+		{% if user.is_authenticated %}
+		<p id="userbar">{% trans "Hello" %} <a href="{% url profile_user user.username|url_encode %}">{{ user.username }}</a> (<a href="/accounts/logout/">{% trans "Déconnexion" %}</a>) - <a href="{% url dashboard %}">{% trans "Dashboard" %}</a>{% if user.is_superuser %} - <a href="/admin/">{% trans "Administration" %}</a>{% endif %}</p>
+		{% else %}
+		<p id="userbar"></p>
+		{% endif %}
+		<a href="/"><img src="/site_media/img/logo.jpg" alt="" id="logo" /></a>
+		<div class="right_head">
+		<ul id="categories">
+			{% get_popular_categories 5 as categories_list %}
+			{% for cat in categories_list %}<li><a href="{{ cat.get_absolute_url }}" title="{{ cat.description }}"><span>{{ cat.name }}</span></a></li>{% endfor %}
+		</ul>
+		</div>
+		</div>
+	</div>
+	
+	<div id="speedbar">
+		<div class="width_content">
+		<form action="/" method="post" id="search">
+			<p><input type="text" name="search_name" id="search_name" /><input type="submit" name="search_submit" id="search_submit" value="Go" /></p>
+		</form>
+		<span id="fil_ariane">{% trans "Vous êtes ici" %} : <a href="http://{{ SITE_DOMAIN }}">{{ SITE_NAME }}</a> &gt; {% block fil_ariane %}{% trans "Page inconnue" %}{% endblock %}</span>
+		</div>
+	</div>
+	
+	<div id="page" class="width_content">
+	<div id="content">
+	{% block content %}{% endblock %}
+	</div>
+		
+	<div id="sidebar">
+	{% get_featured_posts 5 as list_featured %}
+	<h3><a href="/feeds/featured/" class="float_right"><img src="/site_media/images/small_rss.png" alt="{% trans "Flux rss" %}" /></a> {% trans "Lectures recommandées" %}</h3>
+	{% if list_featured %}
+	<ul id="featured_posts">
+	{% for featured in list_featured %}
+		<li><a href="{{ featured.get_absolute_url }}">{{ featured.title }}</a></li>
+	{% endfor %}
+	</ul>
+	{% endif %}
+	<br /><br />
+	
+	{% if TWITTER_LOGIN %}
+	<h3><a href="http://twitter.com/{{ TWITTER_LOGIN }}">{% trans "En direct de Twitter" %}</a></h3>
+	{% get_latest_tweets TWITTER_LOGIN 5 as tweets_list %}
+	<ul>
+	{% for tweet in tweets_list %}
+		<li>{{ tweet.text }} <span class="tgris">{{ tweet.date|date_diff }}</span></li>
+	{% endfor %}
+	</ul>
+	<p><a href="http://twitter.com/{{ TWITTER_LOGIN }}"><img src="/site_media/img/button_followtwitter2.png" alt="" /></a></p>
+	<br />
+	{% endif %}
+	
+	<h3><a href="/feeds/comments/" class="float_right"><img src="/site_media/images/small_rss.png" alt="{% trans "Flux rss" %}" /></a> {% trans "Derniers commentaires" %}</h3>
+	{% get_last_comments 5 as list_comments %}
+	{% if list_comments %}
+	<ul>
+	{% for comment in list_comments %}
+		<li><a href="{% url redirect_to_comment comment.id %}" title="{{ comment.submit_date|date_diff }}">{{ comment.user_name }}</a>: {{ comment.comment|safe|striptags|truncatewords:15 }}</li>
+	{% endfor %}
+	</ul>
+	{% endif %}
+	<br /><br />
+	
+	<h3>{% trans "Liens" %}</h3>
+	<ul>
+		<li></li>
+	</ul>
+	</div>
+	</div>
+	
+	<hr class="clearer" />
+	<div id="footer">
+	<ul class="width_content">
+		<li class="float_right">{% blocktrans %}Propulsé par le framework web <a href="http://djangoproject.com">Django</a>{% endblocktrans %}</li>
+		<li><a href="/">{% trans "Accueil" %}</a></li>
+		<li><a href="/">{% trans "En savoir plus" %}</a></li>
+		<li><a href="/">{% trans "Mentions légales" %}</a></li>
+		<li><a href="{% url feeds %}">{% trans "Flux RSS" %}</a></li>
+		<li><a href="/contact/">{% trans "Contactez-nous" %}</a></li>
+	</ul>
+	</div>
+	
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script type="text/javascript" src="/site_media/js/common.js"></script>
+	
+	<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+	<script type="text/javascript">
+	try {
+	var pageTracker = _gat._getTracker("UA-15407407-1");
+	pageTracker._trackPageview();
+	} catch(err) {}</script>
+	</body>
+</html>

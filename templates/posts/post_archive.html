@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load i18n common_tags threadedcomments_tags comments %}
+
+{% url feed "comments" %}
+
+{% block title %}{% spaceless %}
+	{% if archive_month %}
+		{% blocktrans with month|date:"Y" as year and month|date:"F" as month %}Archives de {{ month }} {{ year }}{% endblocktrans %}
+	{% else %}
+		{% blocktrans with day|date:"Y" as year and day|date:"F" as month and day|date:"d" as day %}Archives du {{ day }} {{ month }} {{ year }}{% endblocktrans %}
+	{% endif %}
+{% endspaceless %}{% endblock %}
+
+{% block fil_ariane %}{% spaceless %}
+	<a href="{% url archive_index %}">{% trans "Archives" %}</a> &gt; 
+	{% if archive_month %}
+		<a href="{% url archive_year month|date:"Y" %}">{{ month|date:"Y" }}</a> &gt; 
+		{{ month|date:"F" }}
+	{% else %}
+		<a href="{% url archive_year day|date:"Y" %}">{{ day|date:"Y" }}</a> &gt; 
+		<a href="{% url archive_month day|date:"Y" day|date:"M"|lower %}">{{ day|date:"F" }}</a> &gt;
+		{{ day|date:"d" }}
+	{% endif %}
+{% endspaceless %}{% endblock %}
+
+{% block content %}
+
+<h1>{% if archive_month %}{{ month|date:"F" }} {{ month|date:"Y" }}{% else %}{{ day|date:"d" }} {{ day|date:"F" }} {{ day|date:"Y" }}{% endif %}</h1>
+
+{% for post in posts_list %}
+{% include "posts/row_post_clean.html" %}
+{% endfor %}
+
+<p class="pagination">{% spaceless %}
+	{% if has_previous %}
+		<a href="?page={{ previous }}">Previous</a> | 
+	{% endif %}
+	
+	Page {{ page }} of {{ pages }} 
+	
+	{% if has_next %}
+		| <a href="?page={{ next }}">Next</a>
+	{% endif %}
+{% endspaceless %}</p>
+
+{% endblock %}

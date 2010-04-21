@@ -1,0 +1,6 @@
+{% load i18n common_tags %}
+<div class="row_post post_{% cycle odd,even %} display_clean" id="post_{{ post.id }}">
+	<div class="date_left">{{ post.published_at|date_diff }}</div>
+	<h2 class="post_title"><a href="{{ post.get_absolute_url }}" title="{% blocktrans with post.author.username as author and post.category as category %}Par {{ author}} dans {{ category }}{% endblocktrans %}">{{ post.title }}</a></h2>
+	<div class="nb_comments"><a href="{{ post.get_absolute_comments_url }}">{{ post.nb_comments }}</a></div>
+</div>

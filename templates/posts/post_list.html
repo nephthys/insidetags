@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load i18n common_tags comments %}
+
+{% url feed "comments" %}
+
+{% block title %}{% spaceless %}
+	{% if category %}
+		{% blocktrans with category.name as name %}Catégorie {{ name }}{% endblocktrans %}
+	{% endif %}
+	{% if author %}
+		{% blocktrans with author.username as username %}Articles de {{ username }}{% endblocktrans %}
+	{% endif %}
+	{% if tag %}
+		{% blocktrans with tag.name as name %}Tag {{ name }}{% endblocktrans %}
+	{% endif %}
+	{% if home %}
+		{{ SITE_NAME }}
+	{% endif %}
+	{% if search %}
+		{% blocktrans with search as search %}Recherche {{ search }}{% endblocktrans %}
+	{% endif %}
+{% endspaceless %}{% endblock %}
+
+{% block fil_ariane %}{% spaceless %}
+	{% if category %}{{ category.name }}{% endif %}
+	{% if author %}{% trans "Auteur" %} &gt; {{ author.username }}{% endif %}
+	{% if tag %}{{ tag.name }}{% endif %}
+	{% if home %}{% trans "Accueil du blog" %}{% endif %}
+	{% if search %}{% trans "Recherche" %} &gt; {{ search }}{% endif %}
+{% endspaceless %}{% endblock %}
+
+{% block feeds %}{{ block.super }}
+	{% if category %}
+		<link rel="alternate" type="application/rss+xml" title="{% blocktrans with category.name as name %}Articles de la catégorie {{ name }}{% endblocktrans %}" href="{% if RES_FEED_URL %}{{ RES_FEED_URL }}{% else %}/feeds/category/{{ category.slug }}/{% endif %}" />
+	{% endif %}
+	{% if tag %}
+		<link rel="alternate" type="application/rss+xml" title="{% blocktrans with tag.name as name %}Articles avec le tag {{ name }}{% endblocktrans %}" href="/feeds/tag/{{ tag.name|url_encode }}/" />
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if category %}<h1>{{ category.name }}</h1>{% endif %}
+{% if author %}<h1>{% gravatar author.email 40 %} {{ author.username }}</h1>{% endif %}
+{% if tag %}<h1>{{ tag.name }}</h1>{% spaceless %}
+{% if related_tags %}
+<p class="related_tags">
+	{% blocktrans with related_tags|pluralize as plural %}
+		Tag{{ plural }} associé{{ plural }} :
+	{% endblocktrans %}
+	{% for same_tag in related_tags %}
+		<a href="{% url view_tag same_tag.name|url_encode %}" class="tagitem">{{ same_tag.name }}</a>
+	{% endfor %}
+</p>
+{% endif %}	
+{% endspaceless %}{% endif %}
+
+{% for post in posts_list %}
+{% if display %}{% ifequal display "clean" %}{% include "posts/row_post_clean.html" %}{% endifequal %}
+{% else %}{% include "posts/row_post.html" %}{% endif %}
+{% endfor %}
+
+<p class="pagination">{% spaceless %}
+	{% if has_previous %}<a href="?page={{ previous }}">{% trans "Page précédente" %}</a> |{% endif %}
+	{% blocktrans with page as page and pages as pages %}Page {{ page }} sur {{ pages }}{% endblocktrans %}
+	{% if has_next %}| <a href="?page={{ next }}">{% trans "Page suivante" %}</a>{% endif %}
+{% endspaceless %}</p>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% load i18n common_tags %}
+<div class="row_post post_{% cycle odd,even %}" id="post_{{ post.id }}">
+	<div class="nb_comments float_right"><a href="{{ post.get_absolute_comments_url }}">{{ post.nb_comments }}</a></div>
+    <h2 class="post_title"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h2>
+	{% url profile_user post.author.username|url_encode as url_profile %}
+    <ul class="post_info">
+        <li class="author">{% blocktrans with post.author.username as author and url_profile as url %}Par <a href="{{ url }}">{{ author }}</a>{% endblocktrans %}</li>
+        <li class="date">{{ post.published_at|date_diff }}</li>
+        <li class="category">{% blocktrans with post.category as category and post.category.get_absolute_url as link %}Dans <a href="{{ link }}">{{ category }}</a>{% endblocktrans %}</li>
+    </ul>
+    <div class="postcontent">{% if post.head %}
+        {{ post.head_html|safe }}
+        <p class="read_more"><a href="{{ post.get_absolute_url }}">{% trans "Lire la suite" %}</a></p>
+    {% else %}
+        {% if post.head %}
+            {{ post.head_html|safe }}
+        {% endif %}
+        {{ post.body_html|safe }}
+    {% endif %}</div>
+</div>

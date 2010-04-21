@@ -1,0 +1,6 @@
+{% load i18n %}
+
+{% if obj.head_html %}{{ obj.head_html|safe }}{% endif %}
+{{ obj.body_html|safe }}
+
+<p><em>{% blocktrans with site.domain as url and site.name as name %}Lire l'article original sur <a href="{{ url }}">{{ name }}</a>{% endblocktrans %}</em></p>

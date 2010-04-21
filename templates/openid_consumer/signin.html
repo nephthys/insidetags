@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load i18n common_tags threadedcomments_tags comments %}
+
+{% block title %}{% trans "Connexion avec OpenID" %}{% endblock %}
+{% block fil_ariane %}{% trans "Connexion avec OpenID" %}{% endblock %}
+
+{% block content %}
+<h1>{% trans "Connexion" %}</h1>
+<form action="{{ action }}" method="post">
+	<p><input class="openid" type="text" name="openid_url" /> <input type="submit" value="{% trans "Se connecter" %}" /></p>
+</form>
+{% endblock %}

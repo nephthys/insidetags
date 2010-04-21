@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Contact" %}{% endblock %}
+{% block fil_ariane %}{% trans "Contact" %}{% endblock %}
+
+{% block content %}
+{% if num_msg %}
+	{% ifequal num_msg 60 %}<div id="msg" class="success">{% trans "Votre message a bien été envoyé. Merci !" %}</div>{% endifequal %}
+{% endif %}
+    
+<h2>{% trans "Formulaire de contact" %}</h2>
+
+<form action="./" method="post" class="form">
+{{ form.as_p }}
+<p class="bcontactform"><input type="submit" name="submit" id="submit_butt" value="{% trans "Envoyer" %}" /></p>
+</form>
+
+{% endblock %}

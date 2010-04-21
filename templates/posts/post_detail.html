@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load i18n common_tags comments threadedcomments_tags %}
+
+{% block metas %}
+<meta name="description" content="{% if post.page_description %}{{ post.page_description }}{% else %}{% if post.head %}{{ post.head_html|striptags|truncatewords:50 }}{% endif %}{{ post.body_html|striptags|truncatewords:50 }}{% endif %}" />
+{% if related_tags %}<meta name="tags" content="{% for tag in related_tags %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}" />{% endif %}
+{% endblock %}
+
+{% block feeds %}{{ block.super }}
+		<link rel="alternate" type="application/rss+xml" title="{% blocktrans with post.title as title %}Commentaires de l'article {{ title }}{% endblocktrans %}" href="/feeds/comment/{{ post.id }}/" />
+{% endblock %}
+
+{% block title %}{% if post.page_title %}{{ post.page_title }}{% else %}{{ post.title }}{% endif %}{% endblock %}
+{% block fil_ariane %}<a href="{{ post.category.get_absolute_url }}">{{ post.category.name }}</a> &gt; {{ post.title }}{% endblock %}
+{% block content %}
+
+<h2 id="post_{{ post.id }}" class="post_title">{{ post.title }}</h2>
+
+<ul class="post_info">
+	{% url profile_user post.author.username|url_encode as url_profile %}
+    <li class="author">{% blocktrans with post.author.username as author and url_profile as link %}Par <a href="{{ link }}">{{ author }}</a>{% endblocktrans %}</li>
+    <li class="date">{% if post.published_at %}<a href="{% url archive_day post.published_at|date:"Y" post.published_at|date:"M"|lower post.published_at|date:"d" %}" class="link_post_archive" title="{% blocktrans with post.published_at|date:"Y" as year and post.published_at|date:"F" as month and post.published_at|date:"d" as day %}Archives du {{ day }} {{ month }} {{ year }}{% endblocktrans %}">{{ post.published_at|date_diff }}</a>{% else %}{{ post.updated_at|date_diff }}{% endif %}</li>
+    <li class="category">{% blocktrans with post.category as category and post.category.get_absolute_url as link %}Dans <a href="{{ link }}">{{ category }}</a>{% endblocktrans %}</li>
+</ul>
+
+{% if user.is_authenticated %}{% ifequal post.author user %}{% ifequal post.status 1 %}
+<p>{% trans "Cet article est en cours de rédaction" %}</p>
+<p><a href="{% url update_post post.id %}" class="bouton_vert">{% trans "Editer" %}</a> <span class="tpetit">{% trans "ou" %}</span> <a href="{% url submit_post post.id %}" class="bouton_action">{% trans "Proposer à la validation" %}</a></p>
+{% endifequal %}{% endifequal %}{% endif %}
+
+<div class="postcontent">{% if post.head %}
+    {{ post.head_html|safe }}
+{% endif %}
+{{ post.body_html|safe }}</div>
+
+{% if related_tags %}
+<p class="related_tags">
+	<strong>{% blocktrans with related_tags|pluralize as plural %}Tag{{ plural }} :{% endblocktrans %}</strong>
+	{% for tag in related_tags %}{% spaceless %}
+		<a href="{% url view_tag tag.name|url_encode %}" class="tagitem">{{ tag.name }}</a>
+	{% endspaceless %} {% endfor %}
+</p>
+{% endif %}
+
+<br /><h3 id="c">{% blocktrans count post.nb_comments as number %}{{ number }} commentaire{% plural %}{{ number }} commentaires{% endblocktrans %} <a href="/feeds/comment/{{ post.id }}/"><img src="/site_media/images/small_rss.png" alt="{% trans "Flux rss" %}" /></a></h3>
+
+{% get_comment_list for post as comment_list %}
+
+{% for comment in comment_list|fill_tree %}
+	<div id="c{{ comment.id }}" class="row_comment thread-{{ comment.depth }} {% ifequal comment.depth 1 %}is_comment{% else %}is_reply{% endifequal %}{% if comment.user.is_staff %} comment_is_staff{% endif %}">
+		{% if post.is_open_comments %}<a href="{{ post.get_absolute_url}}?reply_to={{ comment.id }}#c{{ comment.id }}" id="to_comment_{{ comment.id }}" class="bouton_action reply_to_comment">{% trans "Répondre" %}</a>{% endif %}
+		<p class="left_avatar">{% spaceless %}
+		{% if comment.user %}
+			<a href="{% url profile_user comment.user.username|url_encode %}" class="logged_user_comment">{% gravatar comment.user.email 40 %}</a>
+		{% else %}
+			{% gravatar comment.user_email 40 %}
+		{% endif %}{% endspaceless %}</p>
+		<div class="right_content">
+			<p class="comment_info"><span class="comment_author">{% if comment.user_url %}<a href="{{ comment.user_url }}">{{ comment.user_name }}</a>{% else %}{{ comment.user_name }}{% endif %}</span><br /><span class="comment_date">{{ comment.submit_date|date_diff }}</span></p>
+		</div>
+		<div class="comment_content">{{ comment.comment|safe }}</div> <div id="show_form_{{ comment.id }}"></div>
+	</div>
+{% endfor %}
+
+{% if post.is_open_comments %}
+<br /><h3 id="form">{% trans "Poster un commentaire" %}</h3>
+{% if not user.is_authenticated %}
+	{% include "users/need_login.html" %}
+{% endif %}
+<div class="_content_form_comments">
+{% if reply_to %}{% render_comment_form for post with reply_to %}{% else %}{% render_comment_form for post %}{% endif %}
+</div>
+{% else %}
+<h3>{% trans "Commentaires fermés" %}</h3>
+<p>{% trans "Les commentaires de cet article sont fermés." %}</p>
+{% endif %}
+{% endblock %}

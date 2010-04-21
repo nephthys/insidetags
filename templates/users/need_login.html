@@ -1,0 +1,13 @@
+{% load i18n common_tags %}
+
+{% url socialauth_twitter_login as twitter_login %}
+{% url socialauth_facebook_login as facebook_login %} 
+{% url socialauth_google_login as gmail_login %} 
+{% url socialauth_openid_login as openid_login %}
+
+<p>Se connecter avec 
+	<a href="{{ gmail_login }}?redirect_to={{ post.get_absolute_url|url_encode }}%23form" title="Gmail"><img src="/site_media/images/login_with_gmail.png" alt="Gmail" /></a>
+	<a href="{{ twitter_login }}?redirect_to={{ post.get_absolute_url|url_encode }}%23form" title="Twitter"><img src="/site_media/images/login_with_twitter.png" alt="Twitter" /></a> 
+	<a href="{{ facebook_login }}?redirect_to={{ post.get_absolute_url|url_encode }}%23form" title="Facebook"><img src="/site_media/images/login_with_facebook.png" alt="Facebook" /></a>
+	<a href="{{ openid_login }}?redirect_to={{ post.get_absolute_url|url_encode }}%23form" title="OpenID"><img src="/site_media/images/login_with_openid.png" alt="OpenID" /></a>
+</p>

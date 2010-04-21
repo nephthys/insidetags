@@ -1,0 +1,21 @@
+{% load comments i18n %}
+<form action="{% comment_form_target %}" method="post">
+	{% for field in form %}{% if field.is_hidden %}{{ field }}{% endif %}{% endfor %}
+	{% if user.is_authenticated %}
+	<input type="hidden" name="url" id="id_url" value="{% if user.get_profile.url %}{{ user.get_profile.url }}{% endif %}" />
+	{% else %}
+	<p class="float_right"><label for="id_url">{% trans "URL" %}</label> <input type="text" name="url" id="id_url" /></p>
+	{% endif %}
+	{% if not user.is_authenticated %}
+	<p><label for="id_name">{% trans "Nom d'utilisateur" %}</label> <input name="name" maxlength="50" id="id_name" type="text" /></p>
+	<p><label for="id_email">{% trans "Adresse email" %}</label> <input name="email" id="id_email" type="text" /></p>
+	{% else %}
+	<input type="hidden" name="name" maxlength="50" id="id_name" value="{{ user.username }}" />
+	{% endif %}
+	<p><label for="id_comment">{% trans "Commentaire" %}</label> <textarea id="id_comment" rows="10" cols="40" name="comment" class="textarea"></textarea></p>
+	<p style="display:none;"><label for="id_honeypot">{% trans "Si vous saisissez quelque chose dans ce champ, votre commentaire sera considéré comme étant indésirable" %}</label> <input type="text" name="honeypot" id="id_honeypot" /></p>
+	<p class="submit">
+		<input type="hidden" name="next" value="{{ request.path }}" />
+		<input type="submit" name="post" class="submit-post" value="{% trans "Post" %}" />
+	</p>
+</form>

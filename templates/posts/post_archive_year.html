@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% blocktrans with year as year %}Archives de l'année {{ year }}{% endblocktrans %}{% endblock %}
+{% block fil_ariane %}<a href="{% url archive_index %}">{% trans "Archives" %}</a> &gt; {{ year }}{% endblock %}
+
+{% block content %}
+<h1>{{ year }}</h1>
+
+<div class="postcontent">
+<ul class="archives_list">
+{% for date in date_list %}
+<li><a href="{{ date|date:"M"|lower }}/">{{ date|date:"F" }}</a></li>
+{% endfor %}
+</ul>
+</div>
+
+{% endblock %}

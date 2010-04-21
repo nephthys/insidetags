@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n common_tags extends_tags %}
+
+{% block fil_ariane %}{{ flatpage.title }}{% endblock %}
+{% block title %}{{ flatpage.title }}{% endblock %}
+{% block metas %}
+{% extend_flatpage flatpage.id as more_flatpage %}
+{% if more_flatpage.description %}<meta name="description" content="{{ more_flatpage.description }}" />{% endif %}
+{% if more_flatpage.keywords %}<meta name="tags" content="{{ more_flatpage.keywords }}" />{% endif %}
+{% endblock %}
+
+{% block content %}
+{% extend_flatpage flatpage.id as more_flatpage %}
+
+<h2 class="post_title">{{ flatpage.title }}</h2>
+<ul class="post_info">
+    <li class="date">{% blocktrans with more_flatpage.created_at|date_diff as created_at %}Créée {{ created_at }}{% endblocktrans %}</li>
+    {% ifnotequal more_flatpage.created_at|date:"j F Y h:i" more_flatpage.updated_at|date:"j F Y h:i" %}
+    <li>{% blocktrans with more_flatpage.updated_at|date_diff as updated_at %}Dernière modification {{ updated_at }}{% endblocktrans %}</li>
+    {% endifnotequal %}
+</ul>
+
+<div class="postcontent">{{ more_flatpage.content_html|safe }}</div>
+
+{% endblock %}
