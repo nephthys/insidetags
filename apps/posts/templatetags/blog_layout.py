@@ -86,10 +86,10 @@ class LatestTweetsNode(template.Node):
         if tweets is None:
             tweets = []
             tweets_nb = 0
-			try:
-            	tweets_list = twitter.Api().GetUserTimeline(self.username)
-			except:
-				tweets_list = []
+            try:
+                tweets_list = twitter.Api().GetUserTimeline(self.username)
+            except:
+                tweets_list = []
             for tweet in tweets_list:
                 if not tweet.text.startswith('@') and tweets_nb < self.num:
                     tweet.text = twitterfy(tweet.text)
